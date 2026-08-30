@@ -38,6 +38,10 @@ curl https://YOUR-RAILWAY-DOMAIN.up.railway.app/api/v1/events \
 
 Upstream is pinned to `v1.3.0` in this repository; updating is a deliberate bump: replace `server/` with the new tag's tree, update the version references in this README, and push. The template deploys from this repository, so it will not drift on its own.
 
+## Differences from upstream
+
+Exactly one line of the vendored tree is changed for Railway: the Dockerfile's `VOLUME ["/data"]` declaration is removed (with an explanatory comment), because Railway's builder rejects Docker `VOLUME` directives. Persistence is unchanged in practice: a Railway volume is mounted at `/data`, which is what the upstream declaration intended. Everything else — Go source, migrations, web UI, and all other Dockerfile lines — is byte-identical to upstream `v1.3.0`.
+
 ## Provenance and license
 
 - Upstream: https://github.com/chrisgreg/boop
