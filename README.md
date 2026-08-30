@@ -1,5 +1,7 @@
 # Boop on Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/boop?referralCode=ZqgrJ0)
+
 [Boop](https://github.com/chrisgreg/boop) is a tiny, self-hosted notification inbox for developers. Your apps `POST` an event to one endpoint; Boop stores it and pushes it to your phone through Apple Push Notifications. There is no hosted relay, account system, or telemetry.
 
 This repository is a [Railway](https://railway.com) template wrapper. It vendors the upstream `server/` source at a pinned release and adds nothing else: no forks, no patches, no configuration generation.
