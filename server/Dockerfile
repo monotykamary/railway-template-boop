@@ -24,7 +24,9 @@ FROM alpine:3.21
 RUN apk add --no-cache ca-certificates tzdata && adduser -D -u 1000 boop && mkdir -p /data && chown boop:boop /data
 COPY --from=build /boop /usr/local/bin/boop
 USER boop
-VOLUME ["/data"]
+# Railway adapter: the upstream `VOLUME ["/data"]` declaration is removed because
+# Railway's builder rejects Docker VOLUME directives. Persistence is provided by
+# a Railway volume mounted at /data (see the repository README).
 EXPOSE 8080
 ENV BOOP_PORT=8080 BOOP_DATABASE_PATH=/data/boop.db
 HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://127.0.0.1:8080/health || exit 1
