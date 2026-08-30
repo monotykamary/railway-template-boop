@@ -40,7 +40,12 @@ Upstream is pinned to `v1.3.0` in this repository; updating is a deliberate bump
 
 ## Differences from upstream
 
-Exactly one line of the vendored tree is changed for Railway: the Dockerfile's `VOLUME ["/data"]` declaration is removed (with an explanatory comment), because Railway's builder rejects Docker `VOLUME` directives. Persistence is unchanged in practice: a Railway volume is mounted at `/data`, which is what the upstream declaration intended. Everything else — Go source, migrations, web UI, and all other Dockerfile lines — is byte-identical to upstream `v1.3.0`.
+The vendored tree is byte-identical to upstream `v1.3.0` except for two Railway-compatibility changes in `server/`, each commented in place:
+
+1. **`server/Dockerfile`:** the upstream `VOLUME ["/data"]` declaration is removed, because Railway's builder rejects Docker `VOLUME` directives. Persistence is unchanged in practice: a Railway volume is mounted at `/data`.
+2. **`server/Dockerfile` + `server/entrypoint.sh` (new):** Railway mounts volumes root-owned, so the container starts as root, `chown`s `/data` to uid 1000, then drops to uid 1000 via `su-exec` — preserving the upstream image's non-root runtime posture. When started as a non-root user (e.g. plain `docker compose` on a pre-owned host directory), the entrypoint execs the server directly, matching upstream behavior.
+
+Everything else — Go source, migrations, and the embedded web UI — is unmodified upstream code.
 
 ## Provenance and license
 

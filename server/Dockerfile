@@ -21,13 +21,16 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X github.com/chrisgreg/boo
 
 # ---- runtime: binary + CA certificates only ----
 FROM alpine:3.21
-RUN apk add --no-cache ca-certificates tzdata && adduser -D -u 1000 boop && mkdir -p /data && chown boop:boop /data
+RUN apk add --no-cache ca-certificates tzdata su-exec && adduser -D -u 1000 boop && mkdir -p /data && chown boop:boop /data
 COPY --from=build /boop /usr/local/bin/boop
-USER boop
 # Railway adapter: the upstream `VOLUME ["/data"]` declaration is removed because
 # Railway's builder rejects Docker VOLUME directives. Persistence is provided by
-# a Railway volume mounted at /data (see the repository README).
+# a Railway volume mounted at /data.
+# Railway adapter: the container starts as root so the entrypoint can make the
+# root-owned mounted volume writable, then drops to uid 1000 via su-exec. This
+# preserves the upstream image's non-root runtime posture.
 EXPOSE 8080
 ENV BOOP_PORT=8080 BOOP_DATABASE_PATH=/data/boop.db
 HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://127.0.0.1:8080/health || exit 1
-ENTRYPOINT ["boop"]
+COPY --chmod=0755 entrypoint.sh /usr/local/bin/entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
