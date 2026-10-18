@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- web: build the Svelte UI ----
-FROM node:24-alpine AS web
+FROM node:24.22.0-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS web
 WORKDIR /src
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
@@ -10,7 +10,7 @@ RUN npm run build
 # vite writes to ../internal/web/dist relative to /src/web; with WORKDIR /src that is /internal/web/dist.
 
 # ---- build: compile the Go binary with the UI embedded ----
-FROM golang:1.27-alpine AS build
+FROM golang:1.27.2-alpine@sha256:f92b6ef800e499660581efdabdf25d9d817a9d124eaf900924f0504e7e27e12d AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -20,7 +20,7 @@ ARG VERSION=1.3.0
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X github.com/chrisgreg/boop/server/internal/api.Version=${VERSION}" -o /boop ./cmd/boop
 
 # ---- runtime: binary + CA certificates only ----
-FROM alpine:3.21
+FROM alpine:3.21.8@sha256:ce64758a109eb420d874a118f87920e625e12d3634e03b4a5573fd9f6e5d3507
 RUN apk add --no-cache ca-certificates tzdata su-exec && adduser -D -u 1000 boop && mkdir -p /data && chown boop:boop /data
 COPY --from=build /boop /usr/local/bin/boop
 # Railway adapter: the upstream `VOLUME ["/data"]` declaration is removed because
