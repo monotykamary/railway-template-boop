@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- web: build the Svelte UI ----
-FROM node:24.22.0-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS web
+FROM node:24.22.1-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 AS web
 WORKDIR /src
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
@@ -10,7 +10,7 @@ RUN npm run build
 # vite writes to ../internal/web/dist relative to /src/web; with WORKDIR /src that is /internal/web/dist.
 
 # ---- build: compile the Go binary with the UI embedded ----
-FROM golang:1.27.2-alpine@sha256:f92b6ef800e499660581efdabdf25d9d817a9d124eaf900924f0504e7e27e12d AS build
+FROM golang:1.27.3-alpine@sha256:b8c9b82affbbb82a020bbcf998dad2ba9516944ac7e883524642a481a9505e9c AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
