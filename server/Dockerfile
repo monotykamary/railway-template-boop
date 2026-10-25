@@ -20,7 +20,7 @@ ARG VERSION=1.3.0
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X github.com/chrisgreg/boop/server/internal/api.Version=${VERSION}" -o /boop ./cmd/boop
 
 # ---- runtime: binary + CA certificates only ----
-FROM alpine:3.21.8@sha256:ce64758a109eb420d874a118f87920e625e12d3634e03b4a5573fd9f6e5d3507
+FROM alpine:3.24.3@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
 RUN apk add --no-cache ca-certificates tzdata su-exec && adduser -D -u 1000 boop && mkdir -p /data && chown boop:boop /data
 COPY --from=build /boop /usr/local/bin/boop
 # Railway adapter: the upstream `VOLUME ["/data"]` declaration is removed because
